@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useMemo } from "react";
-import { Transaction, CATEGORIES, PAYMENT_METHODS, CurrencyConfig } from "../types";
+import { Transaction, CATEGORIES, PAYMENT_METHODS, CurrencyConfig } from "./src/types";
 import { 
   Plus, Search, SlidersHorizontal, Trash2, Edit2, Check, X, 
   ArrowUpRight, ArrowDownRight, CircleDollarSign, CalendarDays, RefreshCw
@@ -258,7 +258,7 @@ export default function DailyLedgerTab({
               onChange={(e) => setCategory(e.target.value)}
               className="block w-full px-3 py-2 text-slate-800 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm font-medium"
             >
-              {CATEGORIES.map((cat) => (
+              {CATEGORIES.map((cat: string) => (
                 <option key={cat} value={cat}>
                   {cat}
                 </option>
@@ -277,7 +277,7 @@ export default function DailyLedgerTab({
               onChange={(e) => setPaymentMethod(e.target.value)}
               className="block w-full px-3 py-2 text-slate-800 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm font-medium"
             >
-              {PAYMENT_METHODS.map((pm) => (
+              {PAYMENT_METHODS.map((pm: string) => (
                 <option key={pm} value={pm}>
                   {pm}
                 </option>
@@ -400,7 +400,7 @@ export default function DailyLedgerTab({
                 className="w-full p-1.5 text-xs bg-white border border-slate-200 rounded focus:outline-none"
               >
                 <option value="All">All Categories</option>
-                {CATEGORIES.map((cat) => (
+                {CATEGORIES.map((cat: string) => (
                   <option key={cat} value={cat}>
                     {cat}
                   </option>
@@ -416,7 +416,7 @@ export default function DailyLedgerTab({
                 className="w-full p-1.5 text-xs bg-white border border-slate-200 rounded focus:outline-none"
               >
                 <option value="All">All Payment Systems</option>
-                {PAYMENT_METHODS.map((pm) => (
+                {PAYMENT_METHODS.map((pm: string) => (
                   <option key={pm} value={pm}>
                     {pm}
                   </option>

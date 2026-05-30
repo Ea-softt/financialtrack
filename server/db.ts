@@ -5,10 +5,10 @@
 
 import sqlite3 from "sqlite3";
 import { open, Database } from "sqlite";
-import path from "path";
+import * as path from "node:path";
 import { Transaction, WeeklySummary, MonthlySummary, YearlySummary } from "../src/types";
 
-let dbInstance: Database | null = null;
+let dbPromise: Promise<Database> | null = null;
 const dbFile = path.resolve(process.cwd(), "fintrack.db");
 
 // Helper to calculate correct ISO Week and Year representation (same as original emulator)
@@ -47,35 +47,41 @@ export function getISOWeekRange(weekNo: number, year: number): { startDate: stri
   };
 }
 
-export async function getDb(): Promise<Database> {
-  if (!dbInstance) {
-    dbInstance = await open({
-      filename: dbFile,
-      driver: sqlite3.Database,
-    });
-    
-    // Create the SQLite database schema
-    await dbInstance.exec(`
-      CREATE TABLE IF NOT EXISTS transactions (
-        id TEXT PRIMARY KEY,
-        date TEXT NOT NULL,
-        category TEXT NOT NULL,
-        description TEXT NOT NULL,
-        payment_method TEXT NOT NULL,
-        expense_amount REAL NOT NULL,
-        income_amount REAL NOT NULL
-      );
-      CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date);
-    `);
+/**
+ * Returns a singleton database instance. 
+ * Uses a promise to prevent race conditions during concurrent initialization.
+ */
+export function getDb(): Promise<Database> {
+  if (!dbPromise) {
+    dbPromise = (async () => {
+      const db = await open({
+        filename: dbFile,
+        driver: sqlite3.verbose().Database,
+      });
+      
+      // Create the SQLite database schema
+      await db.exec(`
+        CREATE TABLE IF NOT EXISTS transactions (
+          id TEXT PRIMARY KEY,
+          date TEXT NOT NULL,
+          category TEXT NOT NULL,
+          description TEXT NOT NULL,
+          payment_method TEXT NOT NULL,
+          expense_amount REAL NOT NULL,
+          income_amount REAL NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date);
+      `);
 
-    // Check if table contains rows; if empty, seed default illustrations
-    const countResult = await dbInstance.get<{ "count(*)": number }>("SELECT count(*) FROM transactions");
-    if (countResult && countResult["count(*)"] === 0) {
-      console.log("[SQLite Database] DB is empty. Seeding foundational rows...");
-      await seedDb(dbInstance);
-    }
+      const result = await db.get<{ count: number }>("SELECT count(*) as count FROM transactions");
+      if (result && result.count === 0) {
+        console.log("[SQLite Database] DB is empty. Seeding foundational rows...");
+        await seedDb(db);
+      }
+      return db;
+    })();
   }
-  return dbInstance;
+  return dbPromise;
 }
 
 export async function seedDb(db: Database) {
@@ -140,11 +146,11 @@ export class DbService {
 
   public static async addTransaction(tx: Omit<Transaction, "id">): Promise<Transaction> {
     const db = await getDb();
-    const id = `tx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const id = `tx-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
     await db.run(
       `INSERT INTO transactions (id, date, category, description, payment_method, expense_amount, income_amount)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [id, tx.date, tx.category, tx.description, tx.payment_method, tx.expense_amount, tx.income_amount]
+      [id, tx.date, tx.category, tx.description, tx.payment_method, Number(tx.expense_amount), Number(tx.income_amount)]
     );
     return { ...tx, id };
   }
@@ -155,7 +161,7 @@ export class DbService {
       `UPDATE transactions 
        SET date = ?, category = ?, description = ?, payment_method = ?, expense_amount = ?, income_amount = ?
        WHERE id = ?`,
-      [tx.date, tx.category, tx.description, tx.payment_method, tx.expense_amount, tx.income_amount, tx.id]
+      [tx.date, tx.category, tx.description, tx.payment_method, Number(tx.expense_amount), Number(tx.income_amount), tx.id]
     );
     return tx;
   }
@@ -183,8 +189,8 @@ export class DbService {
       if (!groupKeyMap[groupKey]) {
         groupKeyMap[groupKey] = { totalExpenses: 0, totalIncome: 0 };
       }
-      groupKeyMap[groupKey].totalExpenses += tx.expense_amount;
-      groupKeyMap[groupKey].totalIncome += tx.income_amount;
+      groupKeyMap[groupKey].totalExpenses += Number(tx.expense_amount);
+      groupKeyMap[groupKey].totalIncome += Number(tx.income_amount);
     });
 
     const summaries: WeeklySummary[] = Object.keys(groupKeyMap).map(key => {
@@ -233,8 +239,8 @@ export class DbService {
       if (year !== currentYear) return;
 
       const month = dateObj.getMonth() + 1;
-      monthlyData[month].totalExpenses += tx.expense_amount;
-      monthlyData[month].totalIncome += tx.income_amount;
+      monthlyData[month].totalExpenses += Number(tx.expense_amount);
+      monthlyData[month].totalIncome += Number(tx.income_amount);
     });
 
     return Object.keys(monthlyData).map(mKey => {
@@ -262,8 +268,8 @@ export class DbService {
       if (!yearlyMap[year]) {
         yearlyMap[year] = { totalExpenses: 0, totalIncome: 0 };
       }
-      yearlyMap[year].totalExpenses += tx.expense_amount;
-      yearlyMap[year].totalIncome += tx.income_amount;
+      yearlyMap[year].totalExpenses += Number(tx.expense_amount);
+      yearlyMap[year].totalIncome += Number(tx.income_amount);
     });
 
     const summaries = Object.keys(yearlyMap).map(yKey => {
