@@ -1,0 +1,6 @@
+{
+  "name": "Financial Expense Tracker",
+  "description": "An offline-first expert financial ledger with daily transactions, weekly summaries, monthly comparison charts, and yearly overviews.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
