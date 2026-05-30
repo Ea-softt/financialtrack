@@ -4,7 +4,6 @@
  */
 
 import express from "express";
-import path from "path";
 import * as path from "node:path";
 import { createServer as createViteServer } from "vite";
 import { DbService } from "./server/db";
@@ -27,6 +26,7 @@ async function startServer() {
       await DbService.getWeeklySummaries(); // Triggers initialization
       res.json({ success: true, message: "SQLite Connection Initialized Successfully" });
     } catch (e: any) {
+      console.error("[API Error] /api/init:", e);
       res.status(500).json({ error: e.message });
     }
   });
@@ -37,6 +37,7 @@ async function startServer() {
       const records = await DbService.getLedger();
       res.json(records);
     } catch (e: any) {
+      console.error("[API Error] /api/transactions (GET):", e);
       res.status(500).json({ error: e.message });
     }
   });
