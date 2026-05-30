@@ -18,3 +18,4 @@ View your app in AI Studio: https://ai.studio/apps/5472fb22-68ce-4d5a-9a2c-c9a8e
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+# financialtrack
