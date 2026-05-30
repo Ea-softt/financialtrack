@@ -103,15 +103,6 @@ async function startServer() {
     }
   });
 
-  // Hard Reset / Re-seed DB schema
-  app.post("/api/reset", async (req, res) => {
-    try {
-      await DbService.reset();
-      res.json({ success: true, message: "Db reformatted successfully" });
-    } catch (e: any) {
-      res.status(500).json({ error: e.message });
-    }
-  });
 
   // Mounting corresponding Vite files for dynamic Hot Module static generation
   if (process.env.NODE_ENV !== "production") {

@@ -154,17 +154,4 @@ export class LocalSqliteDb {
     return await res.json();
   }
 
-  /**
-   * ADMIN RESET: Deletes and resets database rows on the real backend SQLite.
-   */
-  public static async resetDb(): Promise<boolean> {
-    const res = await fetch("/api/reset", {
-      method: "POST"
-    });
-    if (!res.ok) {
-      return false;
-    }
-    const data = await res.json();
-    return !!data.success;
-  }
 }

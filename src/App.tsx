@@ -81,47 +81,6 @@ export default function App() {
     await reloadDbData();
   };
 
-  // Bulk Generator Utility (helps play/inspect charts immediately)
-  const handleInjectMockData = async () => {
-    if (!confirm("Generate 6 additional realistic financial flows for Q1 and Q2 2026?")) return;
-    setIsLoading(true);
-    try {
-      const batch = [
-        { date: "2026-02-14", category: "Food & Groceries", description: "Business Lunch Catering", payment_method: "Mobile Money", expense_amount: 145.50, income_amount: 0 },
-        { date: "2026-03-01", category: "Salary", description: "Venture Capital Seed Grant", payment_method: "Bank Transfer", expense_amount: 0, income_amount: 4500.00 },
-        { date: "2026-03-24", category: "Utilities", description: "Cloud Infrastructure Hosting", payment_method: "Bank Card", expense_amount: 320.00, income_amount: 0 },
-        { date: "2026-04-18", category: "Transport", description: "Flight Tickets & Fuel", payment_method: "Bank Card", expense_amount: 512.40, income_amount: 0 },
-        { date: "2026-04-30", category: "Business", description: "SaaS Enterprise Deal License", payment_method: "Bank Transfer", expense_amount: 0, income_amount: 1980.00 },
-        { date: "2026-05-15", category: "Food & Groceries", description: "Team Weekly Provisions Purchase", payment_method: "Cash", expense_amount: 180.00, income_amount: 0 }
-      ];
-
-      for (const t of batch) {
-        await LocalSqliteDb.addTransaction(t);
-      }
-      await reloadDbData();
-      alert("Successfully injected 6 simulated rows! Performance tabs re-indexed.");
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Total Reset
-  const handleResetDb = async () => {
-    if (!confirm("DANGER: Wipe all user records and restore system seeds (the May 29 2026 entries + Jan entries)?")) return;
-    setIsLoading(true);
-    try {
-      await LocalSqliteDb.resetDb();
-      await reloadDbData();
-      alert("SQLite Database tables formatted and indexes reset to system default schemas.");
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // Extract list of all years dynamically for component filters
   const allTransactionsYears = useMemo(() => {
     const list = new Set<number>();
@@ -256,23 +215,6 @@ export default function App() {
             <div className="bg-emerald-400 h-full w-full shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
           </div>
           
-          {/* Admin Database Quick options */}
-          <div className="pt-2 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-[10px] uppercase tracking-wider font-extrabold text-slate-400 text-center">
-            <button 
-              onClick={handleInjectMockData}
-              id="btn-sidebar-seed"
-              className="py-1 px-2 border border-slate-800 rounded hover:bg-slate-800 hover:text-blue-400 transition-colors cursor-pointer"
-            >
-              Seed Data
-            </button>
-            <button 
-              onClick={handleResetDb}
-              id="btn-sidebar-reset"
-              className="py-1 px-2 border border-slate-800 rounded hover:bg-slate-800 hover:text-rose-400 transition-colors cursor-pointer text-slate-450"
-            >
-              Reset DB
-            </button>
-          </div>
         </div>
       </aside>
 
@@ -330,14 +272,6 @@ export default function App() {
           >
             4. Yearly Macros
           </button>
-          <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-800 text-center">
-            <button onClick={() => { handleInjectMockData(); setMobileMenuOpen(false); }} className="py-2 text-[10px] font-bold text-slate-300 uppercase bg-slate-850 rounded">
-              Seed Records
-            </button>
-            <button onClick={() => { handleResetDb(); setMobileMenuOpen(false); }} className="py-2 text-[10px] font-bold text-rose-400 uppercase bg-slate-850 rounded">
-              Clear DB
-            </button>
-          </div>
         </div>
       )}
 

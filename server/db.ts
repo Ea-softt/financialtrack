@@ -73,68 +73,10 @@ export function getDb(): Promise<Database> {
         CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date);
       `);
 
-      const result = await db.get<{ count: number }>("SELECT count(*) as count FROM transactions");
-      if (result && result.count === 0) {
-        console.log("[SQLite Database] DB is empty. Seeding foundational rows...");
-        await seedDb(db);
-      }
       return db;
     })();
   }
   return dbPromise;
-}
-
-export async function seedDb(db: Database) {
-  // Clear any existing values to ensure fresh state if requested
-  await db.exec(`DELETE FROM transactions;`);
-  
-  const seeds = [
-    {
-      id: "seeded-income-may-2026",
-      date: "2026-05-29",
-      category: "Business",
-      description: "Business Consulting Contract Payout",
-      payment_method: "Bank Transfer",
-      expense_amount: 0,
-      income_amount: 3270.00
-    },
-    {
-      id: "seeded-expense-may-2026",
-      date: "2026-05-29",
-      category: "Rent & Accommodation",
-      description: "Co-working Space Monthly Rent",
-      payment_method: "Mobile Money",
-      expense_amount: 710.00,
-      income_amount: 0
-    },
-    {
-      id: "seeded-expense-jan-1",
-      date: "2026-01-15",
-      category: "Utilities",
-      description: "Office Electricity & Internet Bill",
-      payment_method: "Bank Card",
-      expense_amount: 100.00,
-      income_amount: 0
-    },
-    {
-      id: "seeded-expense-jan-2",
-      date: "2026-01-22",
-      category: "Food & Groceries",
-      description: "Weekly Grocery Restocking",
-      payment_method: "Cash",
-      expense_amount: 200.00,
-      income_amount: 0
-    }
-  ];
-
-  for (const s of seeds) {
-    await db.run(
-      `INSERT INTO transactions (id, date, category, description, payment_method, expense_amount, income_amount)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [s.id, s.date, s.category, s.description, s.payment_method, s.expense_amount, s.income_amount]
-    );
-  }
-  console.log("[SQLite Database] Finished seeding core illustrative entries.");
 }
 
 // Database helper queries & dynamic business calculation layer
@@ -170,12 +112,6 @@ export class DbService {
     const db = await getDb();
     const result = await db.run("DELETE FROM transactions WHERE id = ?", [id]);
     return (result.changes ?? 0) > 0;
-  }
-
-  public static async reset(): Promise<boolean> {
-    const db = await getDb();
-    await seedDb(db);
-    return true;
   }
 
   // Aggregate operations fully integrated over real sqlite records
