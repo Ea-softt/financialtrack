@@ -21,12 +21,12 @@ interface WeeklyTabProps {
 }
 
 export default function WeeklyTab({ weeklySummaries, currency }: WeeklyTabProps) {
-  const [selectedYear, setSelectedYear] = useState<number>(2026);
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [weeksDisplayLimit, setWeeksDisplayLimit] = useState<"12" | "all">("12");
 
   // Get list of unique years in dataset
   const yearsList = useMemo(() => {
-    const years = new Set<number>([2026]);
+    const years = new Set<number>([new Date().getFullYear()]);
     weeklySummaries.forEach(s => years.add(s.year));
     return Array.from(years).sort((a, b) => b - a);
   }, [weeklySummaries]);
@@ -271,7 +271,7 @@ export default function WeeklyTab({ weeklySummaries, currency }: WeeklyTabProps)
                   tickFormatter={(val) => `${currency.symbol}${val}`}
                 />
                 <Tooltip 
-                  formatter={(value: any, name: string) => {
+                  formatter={(value: any, name: any) => {
                     const formattedValue = typeof value === 'number' ? formatVal(value) : value;
                     return [formattedValue, name === 'totalIncome' ? 'Weekly Income' : name === 'totalExpenses' ? 'Weekly Expenses' : 'Net Savings'];
                   }}

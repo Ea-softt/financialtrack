@@ -139,7 +139,7 @@ export default function App() {
               <FileSpreadsheet className="w-5 h-5" />
             </div>
             <h1 className="text-white text-lg font-bold tracking-tight">
-              FinTrack <span className="text-blue-400">Pro</span>
+              FinTrack <span className="text-blue-400"></span>
             </h1>
           </div>
           <p className="text-slate-400 text-[10px] mt-1.5 uppercase tracking-widest font-semibold">
@@ -402,11 +402,13 @@ export default function App() {
           <div className="flex items-center gap-2">
             <span className="font-extrabold text-slate-800">FinTrack Database Engine</span>
             <span className="text-slate-200">|</span>
-            <span className="text-slate-600 font-mono font-semibold bg-slate-100 px-2 py-0.5 rounded">2026-05-30 UTC</span>
+            <span className="text-slate-600 font-mono font-semibold bg-slate-100 px-2 py-0.5 rounded">{new Date().toISOString().split('T')[0]} UTC</span>
           </div>
           <div className="flex items-center gap-4">
             <span>Rows Indexed: <strong className="text-slate-800">{transactions.length}</strong></span>
-            <span>Virtual Storage: <strong className="text-slate-800">1.2MB / 50MB</strong></span>
+           
+            <span>Designed By: <strong className="text-slate-800">EA-Soft</strong></span>
+           
             <span className="text-slate-350">|</span>
             <span className="text-indigo-600 font-bold uppercase tracking-wider text-[10px]">Professional Polish Compliant</span>
           </div>

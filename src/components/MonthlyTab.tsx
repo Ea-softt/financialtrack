@@ -25,10 +25,10 @@ export default function MonthlyTab({
   currency,
   allTransactionsYears
 }: MonthlyTabProps) {
-  const [selectedYear, setSelectedYear] = useState<number>(2026);
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
   const yearsList = useMemo(() => {
-    const years = new Set<number>([2026, ...allTransactionsYears]);
+    const years = new Set<number>([new Date().getFullYear(), ...allTransactionsYears]);
     return Array.from(years).sort((a, b) => b - a);
   }, [allTransactionsYears]);
 
