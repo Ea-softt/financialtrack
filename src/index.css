@@ -9,6 +9,8 @@
 body {
   font-family: var(--font-sans);
   background-color: #F8FAFC;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Custom Webkit scrollbar matching the premium professional theme */
